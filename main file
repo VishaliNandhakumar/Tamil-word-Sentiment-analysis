@@ -1,0 +1,53 @@
+from flask import Flask, request, render_template
+
+app = Flask(__name__)
+
+# Define the sentiment analysis function
+def analyze_sentiment(text):
+    # Define positive and negative words in Tamil
+    positive_words = ['அருமை', 'வெற்றி', 'மிகவும்', 'அதிர்ஷ்டமான', 'சிறப்பு', 'நன்மை', 'நலம்தர', 'பேரின்பம்', 'மிகச்சிறப்பு', 'மகிழ்ச்சி', 'நன்றி', 'நல்லா', 'நம்பிக்கை', 'புகழ்', 'உற்சாகம்']
+    negative_words = ['அசிங்கமான', 'மோசமான', 'மோசம்', 'கெட்ட', 'எரிச்சல்', 'தீய', 'தீங்கு','செய்யமுடியாது','எதிரான','நம்பிக்கையற்ற','படுமோசமான','அசிங்கம்!']
+    
+    # Tokenize the text into words
+    words = text.split()
+
+    # Initialize sentiment scores
+    positive_score = 0
+    negative_score = 0
+    
+    # Analyze sentiment based on positive and negative words
+    for word in words:
+        if word in positive_words:
+            positive_score += 1
+        elif word in negative_words:
+            negative_score += 1
+
+    # Determine sentiment
+    if positive_score > negative_score:
+        sentiment = 'Positive'
+    elif positive_score < negative_score:
+        sentiment = 'Negative'
+    else:
+        sentiment = 'Neutral'
+    
+    return sentiment
+
+# Home route to display the form
+@app.route('/')
+def my_form():
+    return render_template('form.html')
+
+# Post route to process the user input
+@app.route('/', methods=['POST'])
+def my_form_post():
+    # Get user input from the form
+    text1 = request.form['text1'].lower()
+
+    # Analyze sentiment of the user input
+    sentiment = analyze_sentiment(text1)
+
+    # Render the result in the HTML template
+    return render_template('form.html', final=sentiment, text1=text1)
+
+if __name__ == "__main__":
+    app.run(debug=True, host="127.0.0.1", port=8080)
